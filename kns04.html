@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bài Thi Kỹ Năng Sống Lớp 1 - 30 Câu Siêu Vui 🌟</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: white;
+      border-radius: 25px;
+      padding: 30px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      text-align: center;
+      position: relative;
+    }
+    h1 {
+      color: #2ecc71;
+      margin-bottom: 10px;
+      font-size: 2.4em;
+    }
+    .progress {
+      font-size: 1.4em;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .question {
+      font-size: 1.7em;
+      margin: 25px 0;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 25px 0;
+    }
+    .option {
+      background: #f0f8ff;
+      border: 3px solid #b3d4fc;
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .option:hover {
+      background: #e0f2ff;
+      border-color: #3498db;
+      transform: scale(1.05);
+    }
+    .option.selected {
+      background: #3498db;
+      color: white;
+      border-color: #2980b9;
+    }
+    button {
+      background: #e67e22;
+      color: white;
+      border: none;
+      padding: 18px 60px;
+      font-size: 1.5em;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 20px 10px 10px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #d35400;
+    }
+    button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+    }
+    #feedback {
+      margin: 25px 0;
+      padding: 25px;
+      border-radius: 20px;
+      font-size: 1.5em;
+      min-height: 100px;
+    }
+    .correct { background: #d4edda; color: #155724; }
+    .wrong   { background: #f8d7da; color: #721c24; }
+    #result {
+      display: none;
+      margin-top: 40px;
+    }
+    .emoji-big {
+      font-size: 5em;
+      margin: 20px 0;
+    }
+
+    /* Toast Notification CSS */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: #333;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 1.3em;
+      max-width: 350px;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast.correct {
+      background: #2ecc71;
+    }
+    .toast.wrong {
+      background: #e74c3c;
+    }
+    .toast span.emoji {
+      font-size: 1.8em;
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      h1 { font-size: 2em; }
+      .question { font-size: 1.5em; }
+      .toast { font-size: 1.1em; padding: 12px 20px; max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Luyện Tập Kỹ Năng Sống Lớp 1 - 30 Câu 🌈</h1>
+  <div class="progress">Câu <span id="current">1</span> / 30</div>
+  
+  <div id="quiz">
+    <div class="question" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <button id="submitBtn" disabled>Nộp đáp án</button>
+    <div id="feedback"></div>
+  </div>
+  
+  <div id="result">
+    <div class="emoji-big" id="emojiResult"></div>
+    <h2 id="scoreText"></h2>
+    <p id="message"></p>
+    <button onclick="location.reload()">Chơi lại nào! 🎉</button>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+  const quizData = [
+  // 1-10: An toàn giao thông
+  { q: "Đi bộ trên đường, em phải đi ở đâu?", opts: ["Giữa lòng đường", "Trên vỉa hè hoặc sát lề bên phải", "Bên trái đường"], ans: 1, expl: "Chính xác! Vỉa hè là dành cho người đi bộ để đảm bảo an toàn 🚶" },
+  { q: "Khi sang đường mà không có đèn tín hiệu, em nên...", opts: ["Chạy thật nhanh", "Nhờ người lớn dẫn sang và quan sát kỹ", "Vừa đi vừa xem điện thoại"], ans: 1, expl: "An toàn! Luôn cần sự giúp đỡ của người lớn khi sang đường 🛣️" },
+  { q: "Ngồi trên xe máy, em phải làm gì?", opts: ["Đứng lên yên xe", "Đội mũ bảo hiểm và bám chặt người lớn", "Không đội mũ"], ans: 1, expl: "Đúng! Mũ bảo hiểm bảo vệ đầu em nếu lỡ bị ngã 🪖" },
+  { q: "Khi ngồi trong xe ô tô, em nên...", opts: ["Thò đầu ra cửa sổ", "Thắt dây an toàn và ngồi yên", "Nghịch tay nắm cửa"], ans: 1, expl: "Chính xác! Thắt dây an toàn giúp bảo vệ em khi xe dừng gấp 🚘" },
+  { q: "Đèn tín hiệu giao thông màu xanh có ý nghĩa gì?", opts: ["Dừng lại", "Được phép đi", "Đi chậm lại"], ans: 1, expl: "Đúng! Đèn xanh là lệnh cho phép chúng ta di chuyển 🟢" },
+  { q: "Em có được chơi đá bóng dưới lòng đường không?", opts: ["Có vì đường rộng", "Không, vì rất nguy hiểm do xe cộ đi lại", "Chỉ chơi lúc vắng xe"], ans: 1, expl: "Đúng! Lòng đường chỉ dành cho phương tiện giao thông thôi ⚽" },
+  { q: "Gặp đèn vàng, người lái xe nên làm gì?", opts: ["Phóng nhanh hơn", "Đi chậm lại và chuẩn bị dừng", "Quay đầu xe"], ans: 1, expl: "Giỏi! Đèn vàng là tín hiệu chuyển giao để mọi người chuẩn bị dừng 🟡" },
+  { q: "Tại sao không nên đi dàn hàng ngang trên đường?", opts: ["Để nói chuyện dễ hơn", "Gây cản trở giao thông và dễ tai nạn", "Cho đẹp đội hình"], ans: 1, expl: "Chính xác! Đi đúng hàng lối giúp đường thông thoáng hơn 🚲" },
+  { q: "Khi đi xe buýt, em nên...", opts: ["Đứng gần cửa ra vào", "Ngồi vào chỗ và nhường ghế cho người già", "Chạy nhảy trên xe"], ans: 1, expl: "Lịch sự và an toàn! Nhường ghế là hành động đẹp trên xe công cộng 🚌" },
+  { q: "Biển báo hình tròn, viền đỏ, có gạch chéo ở giữa là gì?", opts: ["Biển báo chỉ dẫn", "Biển báo cấm", "Biển báo nguy hiểm"], ans: 1, expl: "Đúng! Khi thấy biển này, em không được làm việc ghi trên biển 🚫" },
+
+  // 11-20: Phòng tránh bắt cóc và Người lạ
+  { q: "Một người lạ tự xưng là bạn của bố và bảo đưa em về?", opts: ["Đi theo luôn", "Tuyệt đối không đi và gọi điện hỏi bố", "Lấy kẹo rồi đi"], ans: 1, expl: "Thông minh! Luôn cảnh giác với người lạ để bảo vệ mình 🚫" },
+  { q: "Nếu bị một người lạ kéo tay lôi đi, em nên làm gì?", opts: ["Im lặng", "Hét to 'Bắt cóc, cứu cháu với' và vùng chạy", "Khóc nhỏ"], ans: 1, expl: "Đúng! Hét to giúp thu hút sự chú ý của mọi người xung quanh 📣" },
+  { q: "Em có nên nhận quà hoặc đồ ăn từ người không quen?", opts: ["Có, nếu đồ ăn ngon", "Không, phải xin phép bố mẹ trước", "Lấy rồi vứt đi"], ans: 1, expl: "Chính xác! Đồ ăn từ người lạ có thể chứa thuốc mê nguy hiểm 🍭" },
+  { q: "Khi ở nhà một mình mà có người lạ gõ cửa?", opts: ["Mở cửa ngay", "Không mở cửa và gọi điện cho bố mẹ", "Hỏi xem là ai rồi mở"], ans: 1, expl: "An toàn! Chỉ mở cửa khi có bố mẹ ở nhà hoặc người cực kỳ thân thiết 🏠" },
+  { q: "Quy tắc 'Vùng đồ lót' dạy em điều gì?", opts: ["Cách mặc quần áo", "Không cho người lạ chạm vào vùng kín", "Cách đi bơi"], ans: 1, expl: "Rất quan trọng! Cơ thể em là của em, không ai được phép xâm phạm ✋" },
+  { q: "Nếu bị lạc ở siêu thị, em nên tìm ai giúp đỡ?", opts: ["Tìm một người lạ bất kỳ", "Tìm chú bảo vệ hoặc cô nhân viên quầy thu ngân", "Chạy ra ngoài cửa"], ans: 1, expl: "Thông minh! Người có đồng phục sẽ giúp em tìm lại bố mẹ nhanh nhất 🏬" },
+  { q: "Em nên ghi nhớ điều gì để phòng khi bị lạc?", opts: ["Tên món ăn yêu thích", "Số điện thoại bố mẹ và địa chỉ nhà", "Tên bạn thân"], ans: 1, expl: "Đúng! Đây là 'thông tin cứu hộ' quan trọng nhất của em 📱" },
+  { q: "Nếu người lạ hỏi đường, em nên làm gì?", opts: ["Dẫn họ đi đến tận nơi", "Chỉ đường bằng tay và đứng xa họ", "Lờ đi"], ans: 1, expl: "Tốt! Giúp người là tốt nhưng phải giữ khoảng cách an toàn 📏" },
+  { q: "Tại sao không nên đi chơi một mình ở nơi vắng vẻ?", opts: ["Vì sợ ma", "Dễ gặp kẻ xấu và không ai giúp được", "Vì chán"], ans: 1, expl: "Chính xác! Hãy luôn đi cùng bạn bè hoặc người lớn nhé 🌲" },
+  { q: "Khi có người lạ chụp ảnh em mà em không thích?", opts: ["Đứng im chụp", "Nói 'Không' và bỏ đi chỗ khác", "Cười tươi"], ans: 1, expl: "Đúng! Em có quyền từ chối nếu cảm thấy không thoải mái 📸" },
+
+  // 21-30: An toàn tại nhà (Lửa, Điện, Nước)
+  { q: "Khi thấy có khói và mùi khét trong nhà?", opts: ["Lại gần xem là gì", "Báo người lớn ngay và chạy ra ngoài", "Đóng cửa lại"], ans: 1, expl: "Chính xác! Chạy thoát thân và báo động là ưu tiên hàng đầu 🔥" },
+  { q: "Để thoát khỏi đám cháy có nhiều khói, em nên...", opts: ["Đứng thẳng người", "Bò sát mặt đất và dùng khăn ướt che mũi", "Nhảy qua cửa sổ"], ans: 1, expl: "Đúng! Khói độc thường bay ở trên cao, bò thấp giúp em có oxy 💨" },
+  { q: "Em có được tự ý nghịch ổ cắm điện không?", opts: ["Có, nếu tay khô", "Tuyệt đối không, vì rất dễ bị điện giật", "Chỉ dùng tăm chọc vào"], ans: 1, expl: "Nguy hiểm! Điện có thể làm em bị thương nặng hoặc tử vong ⚡" },
+  { q: "Khi tay đang ướt, em có được bật công tắc điện?", opts: ["Được", "Không, vì nước dẫn điện gây giật", "Chỉ bật bằng chân"], ans: 1, expl: "Chính xác! Luôn lau khô tay trước khi chạm vào thiết bị điện 💧" },
+  { q: "Thấy em bé đang cầm dao, kéo sắc nhọn?", opts: ["Lấy ra nghịch cùng", "Nhẹ nhàng khuyên em bỏ xuống và báo người lớn", "Cổ vũ em"], ans: 1, expl: "Giỏi! Vật sắc nhọn rất dễ gây đứt tay, cần để xa tầm tay trẻ em 🔪" },
+  { q: "Nước sôi trong phích có thể gây ra chuyện gì?", opts: ["Làm em mát", "Gây bỏng nặng nếu đổ vào người", "Làm em cao lớn"], ans: 1, expl: "Đúng! Hãy luôn cẩn thận với những vật nóng trong bếp ☕" },
+  { q: "Em có được tự ý uống thuốc khi không có người lớn?", opts: ["Được, nếu em thấy đau", "Không, phải có người lớn hướng dẫn", "Uống vì thuốc ngọt"], ans: 1, expl: "Nguy hiểm! Uống sai thuốc có thể gây ngộ độc 💊" },
+  { q: "Khi đi bơi, em cần chú ý điều gì?", opts: ["Nhảy xuống nước ngay", "Phải có người lớn giám sát và khởi động kỹ", "Bơi một mình"], ans: 1, expl: "An toàn! Chuột rút hoặc đuối nước rất nguy hiểm nếu ở một mình 🏊" },
+  { q: "Thấy bạn đang nghịch lửa, em nên làm gì?", opts: ["Lấy thêm củi", "Khuyên bạn dừng lại và báo người lớn", "Chụp ảnh bạn"], ans: 1, expl: "Đúng! Một đốm lửa nhỏ có thể gây ra vụ cháy lớn 🕯️" },
+  { q: "Số điện thoại gọi cứu hỏa là số nào?", opts: ["113", "114", "115"], ans: 1, expl: "Chính xác! 114 là số gọi các chú lính cứu hỏa dũng cảm 🚒" }
+];
+
+  let current = 0;
+  let score = 0;
+  const total = quizData.length;
+
+  const qText = document.getElementById("questionText");
+  const optsDiv = document.getElementById("options");
+  const submitBtn = document.getElementById("submitBtn");
+  const feedback = document.getElementById("feedback");
+  const currentEl = document.getElementById("current");
+  const quiz = document.getElementById("quiz");
+  const result = document.getElementById("result");
+  const emojiRes = document.getElementById("emojiResult");
+  const scoreText = document.getElementById("scoreText");
+  const msg = document.getElementById("message");
+  const toastContainer = document.getElementById("toast-container");
+
+  let selectedIndex = -1;
+
+  // Hàm tạo toast
+  function showToast(text, type = 'info') {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span class="emoji">${type === 'correct' ? '✅' : '❌'}</span> ${text}`;
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => toast.classList.add("show"), 100);
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+  function loadQuestion() {
+    const item = quizData[current];
+    qText.textContent = item.q;
+    optsDiv.innerHTML = "";
+    feedback.innerHTML = "";
+    submitBtn.disabled = true;
+    currentEl.textContent = current + 1;
+
+    item.opts.forEach((opt, i) => {
+      const div = document.createElement("div");
+      div.className = "option";
+      div.textContent = opt;
+      div.onclick = () => {
+        document.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+        div.classList.add("selected");
+        selectedIndex = i;
+        submitBtn.disabled = false;  // Bật nút khi đã chọn
+      };
+      optsDiv.appendChild(div);
+    });
+  }
+
+  submitBtn.onclick = () => {
+    const item = quizData[current];
+    const isCorrect = selectedIndex === item.ans;
+
+    if (isCorrect) score++;
+
+    feedback.className = isCorrect ? "feedback correct" : "feedback wrong";
+    feedback.innerHTML = isCorrect 
+      ? `Đúng rồi bé yêu! ${item.expl} ✅` 
+      : `Sai rồi nhé! Đáp án đúng: ${item.opts[item.ans]}<br>${item.expl} 😊`;
+
+    const toastText = isCorrect 
+      ? item.expl 
+      : `Đáp án đúng: ${item.opts[item.ans]}. ${item.expl}`;
+    showToast(toastText, isCorrect ? 'correct' : 'wrong');
+
+    submitBtn.disabled = true;
+
+    // Chuyển câu sau 2 giây
+    setTimeout(() => {
+      current++;
+      if (current < total) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }, 2000);
+  };
+
+  function showResult() {
+    quiz.style.display = "none";
+    result.style.display = "block";
+
+    scoreText.textContent = `Em được ${score} / ${total} điểm! 🎈`;
+
+    if (score >= 25) {
+      emojiRes.textContent = "🥳 Siêu sao kỹ năng sống!";
+      msg.textContent = "Em giỏi quá! Em biết tự lập, an toàn và yêu thương bạn bè rồi đấy! 🌟";
+    } else if (score >= 18) {
+      emojiRes.textContent = "😊 Rất tuyệt vời!";
+      msg.textContent = "Em đã cố gắng nhiều! Tiếp tục rèn luyện nhé bé yêu 💖";
+    } else {
+      emojiRes.textContent = "😄 Cố lên nào!";
+      msg.textContent = "Không sao đâu! Quan trọng là em học được nhiều điều hay. Chơi tiếp nhé! 🚀";
+    }
+  }
+
+  loadQuestion();
+</script>
+</body>
+</html>
