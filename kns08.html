@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bài Thi Kỹ Năng Sống Lớp 1 - 30 Câu Siêu Vui 🌟</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: white;
+      border-radius: 25px;
+      padding: 30px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      text-align: center;
+      position: relative;
+    }
+    h1 {
+      color: #2ecc71;
+      margin-bottom: 10px;
+      font-size: 2.4em;
+    }
+    .progress-wrapper {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      border: 2px dashed #bdc3c7;
+    }
+    .progress {
+      font-size: 1.4em;
+      color: #555;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    /* Style cho bảng điểm thời gian thực */
+    .live-score {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+    .live-correct { color: #27ae60; }
+    .live-wrong { color: #e74c3c; }
+
+    .question {
+      font-size: 1.7em;
+      margin: 25px 0;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 25px 0;
+    }
+    .option {
+      background: #f0f8ff;
+      border: 3px solid #b3d4fc;
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .option:hover {
+      background: #e0f2ff;
+      border-color: #3498db;
+      transform: scale(1.05);
+    }
+    .option.selected {
+      background: #3498db;
+      color: white;
+      border-color: #2980b9;
+    }
+    button {
+      background: #e67e22;
+      color: white;
+      border: none;
+      padding: 18px 60px;
+      font-size: 1.5em;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 20px 10px 10px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #d35400;
+    }
+    button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+    }
+    #feedback {
+      margin: 25px 0;
+      padding: 25px;
+      border-radius: 20px;
+      font-size: 1.5em;
+      min-height: 100px;
+    }
+    .correct { background: #d4edda; color: #155724; }
+    .wrong   { background: #f8d7da; color: #721c24; }
+    
+    #result {
+      display: none;
+      margin-top: 40px;
+    }
+    .emoji-big {
+      font-size: 5em;
+      margin: 20px 0;
+    }
+    
+    /* Bảng kết quả cuối cùng */
+    .final-stats {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .stat-box {
+      padding: 15px 25px;
+      border-radius: 15px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .stat-correct { background: #d4edda; color: #155724; }
+    .stat-wrong { background: #f8d7da; color: #721c24; }
+
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: #333;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 1.3em;
+      max-width: 350px;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.correct { background: #2ecc71; }
+    .toast.wrong { background: #e74c3c; }
+
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      h1 { font-size: 1.8em; }
+      .question { font-size: 1.3em; }
+      .live-score { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Kỹ Năng Sống Lớp 1 🌈</h1>
+  
+  <div class="progress-wrapper">
+    <div class="progress">Câu hỏi: <span id="current">1</span> / 30</div>
+    <div class="live-score">
+      <div class="live-correct">✅ Đúng: <span id="liveCorrect">0</span></div>
+      <div class="live-wrong">❌ Sai: <span id="liveWrong">0</span></div>
+    </div>
+  </div>
+  
+  <div id="quiz">
+    <div class="question" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <button id="submitBtn" disabled>Nộp đáp án</button>
+    <div id="feedback"></div>
+  </div>
+  
+  <div id="result">
+    <div class="emoji-big" id="emojiResult"></div>
+    <h2 id="scoreText"></h2>
+    <div class="final-stats">
+        <div class="stat-box stat-correct">Đúng: <span id="finalCorrect">0</span></div>
+        <div class="stat-box stat-wrong">Sai: <span id="finalWrong">0</span></div>
+    </div>
+    <p id="message"></p>
+    <button onclick="location.reload()">Làm lại bài nhé! 🎉</button>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+  const quizData = [
+  // 1-5: An toàn trong trường học (Khu vực hành lang, cầu thang, sân chơi)
+  { q: "Khi đi xuống cầu thang trường học vào giờ ra chơi rất đông bạn, em nên đi thế nào?", opts: ["Chạy thật nhanh để xuống trước", "Đi sát bên phải, tay vịn lan can và không đùa nghịch", "Đi giữa cầu thang và dang tay ra"], ans: 1, expl: "Chính xác! Đi bên phải và không chạy nhảy giúp em và các bạn không bị ngã nhào 👣" },
+  { q: "Em thấy các bạn đang chơi trò 'đẩy nhau' ở lan can tầng cao, em nên làm gì?", opts: ["Vào chơi cùng các bạn", "Khuyên bạn dừng lại và báo ngay cho thầy cô", "Đứng xem và cổ vũ"], ans: 1, expl: "Rất tỉnh táo! Trò chơi này cực kỳ nguy hiểm, có thể gây ngã từ trên cao xuống 🚫" },
+  { q: "Trong giờ ra chơi, em nên chơi ở đâu là an toàn nhất?", opts: ["Dưới lòng đường xe chạy", "Trong khu vực sân chơi của trường", "Trèo lên cây hoặc cột điện"], ans: 1, expl: "Đúng rồi! Sân trường là nơi an toàn dành riêng cho chúng mình vui chơi 🎈" },
+  { q: "Nếu lỡ va vào một bạn nhỏ hơn làm bạn ngã, em sẽ ứng xử ra sao?", opts: ["Bỏ chạy vì sợ bị mắng", "Đỡ bạn dậy, hỏi thăm và xin lỗi bạn", "Mắng bạn vì không nhìn đường"], ans: 1, expl: "Bé rất văn minh! Biết quan tâm và nhận lỗi là đức tính của người tốt 🤝" },
+  { q: "Khi đi vệ sinh ở trường, em cần lưu ý điều gì để giữ an toàn?", opts: ["Chạy thật nhanh vào sàn ướt", "Đi nhẹ nhàng vì sàn thường trơn trượt, rửa tay xong phải tắt nước", "Bày đồ chơi ra sàn"], ans: 1, expl: "Chính xác! Sàn nhà vệ sinh rất dễ trơn, em cần đi cẩn thận nhé 🧼" },
+
+  // 6-10: Văn minh nơi công cộng (Xe buýt, Thư viện, Bệnh viện)
+  { q: "Khi đi xe buýt công cộng, hành động nào sau đây là không nên?", opts: ["Nhường ghế cho người già và phụ nữ mang thai", "Thò đầu hoặc tay ra ngoài cửa sổ xe", "Giữ trật tự khi xe chạy"], ans: 1, expl: "Nguy hiểm! Thò tay chân ra ngoài có thể bị va chạm với xe khác trên đường 🚌" },
+  { q: "Trong thư viện hoặc bảo tàng, em cần giữ thái độ như thế nào?", opts: ["Nói cười thoải mái", "Đi nhẹ, nói khẽ để không làm phiền người khác", "Chạy nhảy đuổi bắt"], ans: 1, expl: "Đúng! Giữ yên lặng là tôn trọng không gian chung và những người xung quanh 🤫" },
+  { q: "Khi đang xếp hàng mua vé hoặc chờ vào lớp mà có bạn chen ngang, em sẽ...", opts: ["Đánh bạn", "Nhắc nhở nhẹ nhàng: 'Bạn ơi, chúng mình cùng xếp hàng nhé!'", "Cũng chen ngang theo"], ans: 1, expl: "Rất lịch sự! Giải quyết bằng lời nói giúp mọi người vui vẻ hơn 🚶‍♂️" },
+  { q: "Em thấy một bà cụ đang xách túi nặng trên đường, em có thể giúp gì?", opts: ["Chỉ đường cho bà", "Nếu đủ sức, em xin phép giúp bà hoặc nhờ người lớn giúp", "Lấy túi của bà chạy đi"], ans: 1, expl: "Tấm lòng vàng! Giúp đỡ người già là việc làm rất đáng khen ngợi 👵" },
+  { q: "Khi đi xem phim hoặc kịch, tivi đang chiếu đoạn em rất thích, em có nên hét to không?", opts: ["Có chứ, vì em sướng", "Không, nên giữ im lặng để mọi người cùng xem", "Vừa ăn bắp rang vừa nói thật to"], ans: 1, expl: "Chính xác! Hãy là một khán giả lịch sự và văn minh em nhé 🎭" },
+
+  // 11-15: An toàn không gian mạng & Điện tử (Video 1.4)
+  { q: "Khi đang dùng máy tính/điện thoại mà thấy một trang web hiện hình ảnh đáng sợ, em làm gì?", opts: ["Cố gắng xem hết", "Tắt ngay và kể với bố mẹ hoặc cô giáo", "Gửi cho bạn xem cùng"], ans: 1, expl: "Rất giỏi! Luôn báo cho người lớn khi thấy những thứ làm em lo sợ trên mạng 💻" },
+  { q: "Người lạ trên mạng hỏi tên trường và địa chỉ nhà em, em có nên nói không?", opts: ["Có, để làm quen", "Tuyệt đối không tiết lộ thông tin cá nhân cho người lạ", "Nói tên trường thôi"], ans: 1, expl: "Đúng! Giữ bí mật thông tin cá nhân giúp em an toàn trước kẻ xấu trên mạng 🔒" },
+  { q: "Em nên ngồi cách màn hình tivi/máy tính khoảng bao xa là tốt nhất?", opts: ["Ngồi thật sát cho rõ", "Cách ít nhất 2 mét hoặc bằng 5-7 lần chiều rộng màn hình", "Nằm ra sàn xem"], ans: 1, expl: "Chính xác! Giữ khoảng cách giúp bảo vệ đôi mắt của em không bị cận thị 👓" },
+  { q: "Trước khi tải một trò chơi mới về máy, em cần hỏi ý kiến ai?", opts: ["Không cần hỏi ai", "Hỏi ý kiến của bố mẹ hoặc người lớn", "Hỏi bạn hàng xóm"], ans: 1, expl: "Đúng rồi! Bố mẹ sẽ giúp em chọn những trò chơi phù hợp và an toàn 🎮" },
+  { q: "Sử dụng điện thoại/máy tính ngay trước khi đi ngủ có tác hại gì?", opts: ["Giúp ngủ ngon hơn", "Làm não bộ căng thẳng và khó đi vào giấc ngủ", "Chẳng có hại gì"], ans: 1, expl: "Chính xác! Hãy tắt thiết bị điện tử trước khi ngủ 1 tiếng để có giấc ngủ ngon 😴" },
+
+  // 16-20: Tiết kiệm tài nguyên & Bảo vệ môi trường (Video 1.5)
+  { q: "Tại sao chúng ta nên tắt đèn khi không sử dụng hoặc ra khỏi phòng?", opts: ["Để tối cho dễ ngủ", "Để tiết kiệm điện và bảo vệ môi trường", "Vì sợ tốn tiền mua bóng đèn"], ans: 1, expl: "Đúng! Tiết kiệm điện là góp phần bảo vệ trái đất xanh của chúng ta 💡" },
+  { q: "Khi đánh răng, em nên làm gì để tiết kiệm nước?", opts: ["Xả vòi nước chảy liên tục", "Hứng nước vào ly và tắt vòi khi đang chải răng", "Vừa đánh răng vừa nghịch nước"], ans: 1, expl: "Rất tốt! Mỗi giọt nước đều quý giá, em hãy sử dụng thật tiết kiệm nhé 💧" },
+  { q: "Em nên làm gì với những tờ giấy chỉ mới viết được một mặt?", opts: ["Vứt đi mua vở mới", "Dùng mặt còn lại để làm giấy nháp hoặc vẽ", "Lấy làm máy bay giấy"], ans: 1, expl: "Thông minh! Tiết kiệm giấy cũng chính là bảo vệ rừng cây đấy 🌳" },
+  { q: "Hành động nào giúp giảm rác thải nhựa ra môi trường?", opts: ["Dùng túi nilon một lần rồi vứt", "Sử dụng bình nước cá nhân và túi vải khi đi chợ", "Vứt chai nhựa xuống sông"], ans: 1, expl: "Chính xác! Hạn chế dùng nhựa một lần giúp đại dương sạch hơn 🐳" },
+  { q: "Nếu thấy một vòi nước công cộng bị rò rỉ, em sẽ xử lý thế nào?", opts: ["Mặc kệ vì không phải nhà mình", "Thử khóa lại hoặc báo cho người lớn biết để sửa", "Lại gần nghịch nước"], ans: 1, expl: "Tuyệt vời! Ý thức cộng đồng của em rất cao đấy 🌍" },
+
+  // 21-25: Kỹ năng thoát hiểm & Hỏa hoạn (Nâng cao)
+  { q: "Nếu thấy có khói và lửa trong nhà, em nên làm gì đầu tiên?", opts: ["Núp dưới gầm giường hoặc trong tủ", "Bình tĩnh, hô to 'Cháy' và tìm đường thoát ra ngoài", "Cố gắng thu dọn đồ chơi"], ans: 1, expl: "Đúng! Tính mạng là quan trọng nhất, tuyệt đối không được trốn vào chỗ kín 🏃‍♂️" },
+  { q: "Khi thoát ra khỏi phòng có khói, em nên di chuyển như thế nào?", opts: ["Đứng thẳng và chạy thật nhanh", "Bò thấp người sát mặt đất và dùng khăn ướt che mũi miệng", "Nhắm mắt lại chạy"], ans: 1, expl: "Chính xác! Khói thường bay trên cao, bò thấp giúp em hít được không khí sạch hơn 😷" },
+  { q: "Nếu chẳng may bị lửa bén vào quần áo, em phải làm gì?", opts: ["Chạy thật nhanh để gió thổi tắt lửa", "Dừng lại, nằm xuống và lăn qua lăn lại (Stop - Drop - Roll)", "Khóc và đứng yên"], ans: 1, expl: "Giỏi lắm! Lăn người trên đất giúp dập tắt lửa trên quần áo an toàn 🚒" },
+  { q: "Số điện thoại khẩn cấp để gọi cứu hỏa ở Việt Nam là số nào?", opts: ["113", "114", "115"], ans: 1, expl: "Đúng rồi! Hãy nhớ số 114 khi có hỏa hoạn cần cứu giúp ☎️" },
+  { q: "Em có được tự ý sử dụng bật lửa hay nghịch diêm không?", opts: ["Được nếu có bạn chơi cùng", "Tuyệt đối không, vì dễ gây cháy nổ nguy hiểm", "Chỉ nghịch khi bố mẹ đi vắng"], ans: 1, expl: "Nguy hiểm! Lửa không phải là đồ chơi, em cần hết sức cẩn thận 🔥" },
+
+  // 26-30: Thấu cảm & Tôn trọng sự khác biệt (Dựa trên tinh thần Video 1.1 & 1.8)
+  { q: "Em thấy một bạn có màu da hoặc giọng nói khác lạ, em nên...", opts: ["Trêu chọc bạn", "Vẫn vui vẻ kết bạn và tôn trọng sự khác biệt của bạn", "Không chơi với bạn"], ans: 1, expl: "Trái tim ấm áp! Mỗi người đều có nét đẹp riêng, hãy luôn tôn trọng bạn nhé 🌍" },
+  { q: "Khi em làm sai một việc gì đó làm bố mẹ buồn, em nên ứng xử thế nào?", opts: ["Nói dối là mình không làm", "Dũng cảm nhận lỗi và hứa sẽ sửa đổi", "Giận ngược lại bố mẹ"], ans: 1, expl: "Rất dũng cảm! Biết nhận lỗi là bước đầu tiên để em trưởng thành hơn 💖" },
+  { q: "Nếu bạn em đạt giải cao trong cuộc thi vẽ mà em không đạt, em sẽ...", opts: ["Chúc mừng bạn và cùng chia sẻ niềm vui với bạn", "Ghen tị và nói xấu bạn", "Khóc và bỏ về"], ans: 0, expl: "Chính xác! Vui cùng thành công của bạn giúp tình bạn thêm bền vững 🎨" },
+  { q: "Thế nào là 'Lắng nghe tích cực' khi cô giáo đang giảng bài?", opts: ["Nhìn ra cửa sổ", "Mắt nhìn cô, tai lắng nghe và không làm việc riêng", "Nói chuyện với bạn bên cạnh"], ans: 1, expl: "Rất tốt! Lắng nghe giúp em hiểu bài nhanh và thể hiện sự tôn trọng cô 👩‍🏫" },
+  { q: "Kỹ năng sống giúp ích gì cho em trong tương lai?", opts: ["Để em được nhiều điểm 10", "Giúp em tự tin, an toàn và biết cách cư xử tốt với mọi người", "Để em được mua nhiều đồ chơi"], ans: 1, expl: "Tuyệt vời! Kỹ năng sống là hành trang quý giá nhất để em bước vào đời 🌟" }
+];
+
+  let current = 0;
+  let scoreCorrect = 0;
+  let scoreWrong = 0;
+  const total = quizData.length;
+
+  const qText = document.getElementById("questionText");
+  const optsDiv = document.getElementById("options");
+  const submitBtn = document.getElementById("submitBtn");
+  const feedback = document.getElementById("feedback");
+  const currentEl = document.getElementById("current");
+  const liveCorrectEl = document.getElementById("liveCorrect");
+  const liveWrongEl = document.getElementById("liveWrong");
+  const quiz = document.getElementById("quiz");
+  const result = document.getElementById("result");
+  const emojiRes = document.getElementById("emojiResult");
+  const scoreText = document.getElementById("scoreText");
+  const finalCorrectEl = document.getElementById("finalCorrect");
+  const finalWrongEl = document.getElementById("finalWrong");
+  const msg = document.getElementById("message");
+  const toastContainer = document.getElementById("toast-container");
+
+  let selectedIndex = -1;
+
+  function showToast(text, type = 'info') {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span class="emoji">${type === 'correct' ? '✅' : '❌'}</span> ${text}`;
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 100);
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 400);
+    }, 3000);
+  }
+
+  function loadQuestion() {
+    const item = quizData[current];
+    qText.textContent = item.q;
+    optsDiv.innerHTML = "";
+    feedback.innerHTML = "";
+    submitBtn.disabled = true;
+    currentEl.textContent = current + 1;
+
+    item.opts.forEach((opt, i) => {
+      const div = document.createElement("div");
+      div.className = "option";
+      div.textContent = opt;
+      div.onclick = () => {
+        document.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+        div.classList.add("selected");
+        selectedIndex = i;
+        submitBtn.disabled = false;
+      };
+      optsDiv.appendChild(div);
+    });
+  }
+
+  submitBtn.onclick = () => {
+    const item = quizData[current];
+    const isCorrect = selectedIndex === item.ans;
+
+    if (isCorrect) {
+      scoreCorrect++;
+      liveCorrectEl.textContent = scoreCorrect;
+    } else {
+      scoreWrong++;
+      liveWrongEl.textContent = scoreWrong;
+    }
+
+    feedback.className = isCorrect ? "feedback correct" : "feedback wrong";
+    feedback.innerHTML = isCorrect 
+      ? `Chính xác! ${item.expl} ✅` 
+      : `Chưa đúng rồi! Đáp án là: ${item.opts[item.ans]} 😊`;
+
+    showToast(isCorrect ? "Giỏi quá!" : "Cố lên nhé!", isCorrect ? 'correct' : 'wrong');
+    submitBtn.disabled = true;
+
+    setTimeout(() => {
+      current++;
+      if (current < total) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }, 2000);
+  };
+
+  function showResult() {
+    quiz.style.display = "none";
+    result.style.display = "block";
+    
+    finalCorrectEl.textContent = scoreCorrect;
+    finalWrongEl.textContent = scoreWrong;
+    scoreText.textContent = `Tổng cộng: ${scoreCorrect} / ${total} câu đúng!`;
+
+    if (scoreCorrect >= 25) {
+      emojiRes.textContent = "🥳 Siêu Sao!";
+      msg.textContent = "Em thật tuyệt vời, một chuyên gia kỹ năng sống thực thụ!";
+    } else if (scoreCorrect >= 15) {
+      emojiRes.textContent = "😊 Giỏi lắm!";
+      msg.textContent = "Em đã hoàn thành rất tốt, tiếp tục phát huy nhé!";
+    } else {
+      emojiRes.textContent = "💪 Cố lên!";
+      msg.textContent = "Đừng buồn nhé, mỗi lần chơi là một lần học mà!";
+    }
+  }
+
+  loadQuestion();
+</script>
+</body>
+</html>d
